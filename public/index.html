@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Transcript Downloader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #result {
+            white-space: pre-wrap;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        #loading {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>YouTube Transcript Downloader</h1>
+    <input type="text" id="videoId" placeholder="Enter YouTube Video ID">
+    <button onclick="getTranscript()">Get Transcript</button>
+    <div id="loading">Loading...</div>
+    <div id="result"></div>
+
+    <script>
+        async function getTranscript() {
+            const videoId = document.getElementById('videoId').value.trim();
+            const resultDiv = document.getElementById('result');
+            const loadingDiv = document.getElementById('loading');
+            
+            if (!videoId) {
+                resultDiv.textContent = 'Please enter a valid YouTube Video ID';
+                return;
+            }
+
+            loadingDiv.style.display = 'block';
+            resultDiv.textContent = '';
+            
+            try {
+                const response = await fetch(`/api/transcript?videoId=${videoId}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const transcript = data.map(item => item.text).join(' ');
+                    resultDiv.textContent = transcript;
+                } else {
+                    resultDiv.textContent = `Error: ${data.error}`;
+                }
+            } catch (error) {
+                resultDiv.textContent = `Error: ${error.message}`;
+            } finally {
+                loadingDiv.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
